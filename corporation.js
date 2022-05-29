@@ -612,7 +612,7 @@ async function doManageDivision(ns, division, budget) {
   // Update our status
   myCorporation = ns.corporation.getCorporation();
   division = ns.corporation.getDivision(division.name);
-  let hasMarketTA2 = ns.corporation.hasResearched(division.name, 'Market-TA.II');
+  let hasMarketTA2 = ns.corporation.hasUnlockUpgrade(division.name, 'Market-TA.II');
 
   // Division wide tasks
   // Can we buy advertising? This is how we go exponential in our production industry.
@@ -643,7 +643,7 @@ async function doManageDivision(ns, division, budget) {
     let hasResearch = false;
     let cost = Infinity;
     try {
-      hasResearch = ns.corporation.hasResearched(division.name, researchType);
+      hasResearch = ns.corporation.hasUnlockUpgrade(division.name, researchType);
       cost = ns.corporation.getResearchCost(division.name, researchType);
     } catch {}
     if (!hasResearch && researchToSpend >= cost) {
@@ -852,7 +852,7 @@ function getReservedWarehouseSpace(ns, industry, division, city) {
   warehouseSpaceRequiredForCycle *= 10;
 
   // If we don't have automatic price discovery, we'll need some extra free space.
-  let hasMarketTA2 = ns.corporation.hasResearched(division.name, 'Market-TA.II');
+  let hasMarketTA2 = ns.corporation.hasUnlockUpgrade(division.name, 'Market-TA.II');
   if (!hasMarketTA2) warehouseSpaceRequiredForCycle *= 3;
   else warehouseSpaceRequiredForCycle *= 1.5;
 
@@ -865,8 +865,8 @@ function getMaximumProduction(ns, division, city) {
   let prodMult = division.prodMult; // Materials
   let corpMult = 1 + 0.03 * ns.corporation.getUpgradeLevel('Smart Factories'); // Corporate upgrades.
   let resMult = 1;
-  if (ns.corporation.hasResearched(division.name, 'Drones - Assembly')) resMult *= 1.2;
-  if (ns.corporation.hasResearched(division.name, 'Self-Correcting Assemblers')) resMult *= 1.1;
+  if (ns.corporation.hasUnlockUpgrade(division.name, 'Drones - Assembly')) resMult *= 1.2;
+  if (ns.corporation.hasUnlockUpgrade(division.name, 'Self-Correcting Assemblers')) resMult *= 1.1;
   let maxProd = officeMult * prodMult * corpMult * resMult;
   return maxProd;
 }
@@ -911,8 +911,8 @@ function createNewProduct(ns, division) {
 
 function getMaxProducts(ns, divisionName) {
   let maxProducts = 3;
-  if (ns.corporation.hasResearched(divisionName, 'uPgrade: Capacity.I')) maxProducts++;
-  if (ns.corporation.hasResearched(divisionName, 'uPgrade: Capacity.II')) maxProducts++;
+  if (ns.corporation.hasUnlockUpgrade(divisionName, 'uPgrade: Capacity.I')) maxProducts++;
+  if (ns.corporation.hasUnlockUpgrade(divisionName, 'uPgrade: Capacity.II')) maxProducts++;
   return maxProducts;
 }
 
@@ -1022,7 +1022,7 @@ async function doPriceDiscovery(ns) {
   for (const division of myCorporation.divisions) {
     const industry = industries.find((i) => i.name === division.type);
     // If we have Market-TA.II researched, just let that work.
-    let hasMarketTA2 = ns.corporation.hasResearched(division.name, 'Market-TA.II');
+    let hasMarketTA2 = ns.corporation.hasUnlockUpgrade(division.name, 'Market-TA.II');
     if (hasMarketTA2) {
       for (const city of division.cities) {
         // Default prices

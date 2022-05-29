@@ -264,7 +264,7 @@ export async function main(ns) {
         },
         {   // Script to create manage bladeburner for us
             name: "run-corporation.js", tail: openTailWindows,
-            shouldRun: () => 3 in dictSourceFiles && [3].includes(playerBitnode)
+            shouldRun: () => 3 in dictSourceFiles && dictSourceFiles[3] === 3
         },
     ];
     asynchronousHelpers.forEach(helper => helper.name = getFilePath(helper.name));
