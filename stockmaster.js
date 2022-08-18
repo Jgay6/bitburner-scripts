@@ -65,7 +65,7 @@ export function autocomplete(data, args) {
     return [];
 }
 
-/** Requires access to the TIX API. Purchases access to the 4S Mkt Data API as soon as it can 
+/** Requires access to the TIX API. Purchases access to the 4S Mkt Data API as soon as it can
  * @param {NS} ns */
 export async function main(ns) {
     const runOptions = getConfiguration(ns, argsSchema);
@@ -433,14 +433,14 @@ let launchSummaryTail = async ns => {
 }
 
 // Ram-dodging helpers that spawn temporary scripts to buy/sell rather than pay 2.5GB ram per variant
-let buyStockWrapper = async (ns, sym, numShares) => await transactStock(ns, sym, numShares, 'buy'); // ns.stock.buy(sym, numShares);
-let buyShortWrapper = async (ns, sym, numShares) => await transactStock(ns, sym, numShares, 'short'); // ns.stock.short(sym, numShares);
-let sellStockWrapper = async (ns, sym, numShares) => await transactStock(ns, sym, numShares, 'sell'); // ns.stock.sell(sym, numShares);
+let buyStockWrapper = async (ns, sym, numShares) => await transactStock(ns, sym, numShares, 'buyStock'); // ns.stock.buyStock(sym, numShares);
+let buyShortWrapper = async (ns, sym, numShares) => await transactStock(ns, sym, numShares, 'buyShort'); // ns.stock.buyShort(sym, numShares);
+let sellStockWrapper = async (ns, sym, numShares) => await transactStock(ns, sym, numShares, 'sellStock'); // ns.stock.sellStock(sym, numShares);
 let sellShortWrapper = async (ns, sym, numShares) => await transactStock(ns, sym, numShares, 'sellShort'); // ns.stock.sellShort(sym, numShares);
 let transactStock = async (ns, sym, numShares, action) =>
     await getNsDataThroughFile(ns, `ns.stock.${action}(ns.args[0], ns.args[1])`, `/Temp/stock-${action}.txt`, [sym, numShares]);
 
-/** @param {NS} ns 
+/** @param {NS} ns
  * Automatically buys either a short or long position depending on the outlook of the stock. */
 async function doBuy(ns, stk, sharesToBuy) {
     // We include -2*commission in the "holdings value" of our stock, but if we make repeated purchases of the same stock, we have to track
@@ -455,7 +455,7 @@ async function doBuy(ns, stk, sharesToBuy) {
         `${stk.sym.padEnd(5)} @ ${formatMoney(expectedPrice).padStart(9)} for ${formatMoney(sharesToBuy * expectedPrice).padStart(9)} (Spread:${(stk.spread_pct * 100).toFixed(2)}% ` +
         `ER:${formatBP(stk.expectedReturn()).padStart(8)}) Ticks to Profit: ${stk.timeToCoverTheSpread().toFixed(2)}`, noisy, 'info');
     try {
-        price = mock ? expectedPrice : Number(await transactStock(ns, stk.sym, sharesToBuy, long ? 'buy' : 'short'));
+        price = mock ? expectedPrice : Number(await transactStock(ns, stk.sym, sharesToBuy, long ? 'buyStock' : 'shortStock'));
     } catch (err) {
         if (long) throw err;
         disableShorts = true;
@@ -479,7 +479,7 @@ async function doBuy(ns, stk, sharesToBuy) {
     return sharesToBuy * price + commission; // Return the amount spent on the transaction so it can be subtracted from our cash on hand
 }
 
-/** @param {NS} ns 
+/** @param {NS} ns
  * Sell our current position in this stock. */
 async function doSellAll(ns, stk) {
     let long = stk.sharesLong > 0;

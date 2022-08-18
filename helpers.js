@@ -12,7 +12,7 @@ export function formatMoney(num, maxSignificantFigures = 6, maxDecimalPlaces = 3
 const symbols = ["", "k", "m", "b", "t", "q", "Q", "s", "S", "o", "n", "e33", "e36", "e39"];
 
 /**
- * Return a formatted representation of the monetary amount using scale sympols (e.g. 6.50M) 
+ * Return a formatted representation of the monetary amount using scale sympols (e.g. 6.50M)
  * @param {number} num - The number to format
  * @param {number=} maxSignificantFigures - (default: 6) The maximum significant figures you wish to see (e.g. 123, 12.3 and 1.23 all have 3 significant figures)
  * @param {number=} maxDecimalPlaces - (default: 3) The maximum decimal places you wish to see, regardless of significant figures. (e.g. 12.3, 1.2, 0.1 all have 1 decimal)
@@ -167,7 +167,7 @@ export async function getNsDataThroughFile_Custom(ns, fnRun, fnIsAlive, command,
     // Wait for the process to complete
     await waitForProcessToComplete_Custom(ns, fnIsAlive, pid, verbose);
     if (verbose) ns.print(`Process ${pid} is done. Reading the contents of ${fName}...`);
-    // Read the file, with auto-retries if it fails // TODO: Unsure reading a file can fail or needs retrying. 
+    // Read the file, with auto-retries if it fails // TODO: Unsure reading a file can fail or needs retrying.
     let lastRead;
     const fileData = await autoRetry(ns, () => ns.read(fName),
         f => (lastRead = f) !== undefined && f !== "" && f !== initialContents && !(typeof f == "string" && f.startsWith("ERROR: ")),
@@ -256,7 +256,7 @@ export async function runCommand_Custom(ns, fnRun, command, fileName, args = [],
 
 /**
  * Wait for a process id to complete running
- * Importing incurs a maximum of 0.1 GB RAM (for ns.isRunning) 
+ * Importing incurs a maximum of 0.1 GB RAM (for ns.isRunning)
  * @param {NS} ns - The nestcript instance passed to your script's main entry point
  * @param {int} pid - The process id to monitor
  * @param {bool=} verbose - (default false) If set to true, pid and result of command are logged.
@@ -268,7 +268,7 @@ export async function waitForProcessToComplete(ns, pid, verbose) {
 }
 /**
  * An advanced version of waitForProcessToComplete that lets you pass your own "isAlive" test to reduce RAM requirements (e.g. to avoid referencing ns.isRunning)
- * Importing incurs 0 GB RAM (assuming fnIsAlive is implemented using another ns function you already reference elsewhere like ns.ps) 
+ * Importing incurs 0 GB RAM (assuming fnIsAlive is implemented using another ns function you already reference elsewhere like ns.ps)
  * @param {NS} ns - The nestcript instance passed to your script's main entry point
  * @param {function} fnIsAlive - A single-argument function used to start the new sript, e.g. `ns.isRunning` or `pid => ns.ps("home").some(process => process.pid === pid)`
  **/
@@ -350,20 +350,22 @@ export function scanAllServers(ns) {
     return discoveredHosts; // The list of scanned hosts should now be the set of all hosts in the game!
 }
 
-/** @param {NS} ns 
+/** @param {NS} ns
  * Get a dictionary of active source files, taking into account the current active bitnode as well (optionally disabled). **/
 export async function getActiveSourceFiles(ns, includeLevelsFromCurrentBitnode = true) {
     return await getActiveSourceFiles_Custom(ns, getNsDataThroughFile, includeLevelsFromCurrentBitnode);
 }
 
-/** @param {NS} ns 
+/** @param {NS} ns
  * getActiveSourceFiles Helper that allows the user to pass in their chosen implementation of getNsDataThroughFile to minimize RAM usage **/
 export async function getActiveSourceFiles_Custom(ns, fnGetNsDataThroughFile, includeLevelsFromCurrentBitnode = true) {
     checkNsInstance(ns, '"getActiveSourceFiles"');
     // Find out what source files the user has unlocked
     let dictSourceFiles;
     try {
-        dictSourceFiles = await fnGetNsDataThroughFile(ns, `Object.fromEntries(ns.getOwnedSourceFiles().map(sf => [sf.n, sf.lvl]))`, '/Temp/owned-source-files.txt');
+        dictSourceFiles = await fnGetNsDataThroughFile(ns,
+            `Object.fromEntries(ns.singularity.getOwnedSourceFiles().map(sf => [sf.n, sf.lvl]))`,
+            '/Temp/owned-source-files.txt');
     } catch { dictSourceFiles = {}; } // If this fails (e.g. low RAM), return an empty dictionary
     // If the user is currently in a given bitnode, they will have its features unlocked
     if (includeLevelsFromCurrentBitnode) {
@@ -375,7 +377,7 @@ export async function getActiveSourceFiles_Custom(ns, fnGetNsDataThroughFile, in
     return dictSourceFiles;
 }
 
-/** @param {NS} ns 
+/** @param {NS} ns
  * Return bitnode multiplers, or null if they cannot be accessed. **/
 export async function tryGetBitNodeMultipliers(ns) {
     return await tryGetBitNodeMultipliers_Custom(ns, getNsDataThroughFile);
@@ -392,7 +394,7 @@ export async function tryGetBitNodeMultipliers_Custom(ns, fnGetNsDataThroughFile
     return null;
 }
 
-/** @param {NS} ns 
+/** @param {NS} ns
  * Returns the number of instances of the current script running on the specified host. **/
 export async function instanceCount(ns, onHost = "home", warn = true, tailOtherInstances = true) {
     checkNsInstance(ns, '"alreadyRunning"');
@@ -434,7 +436,7 @@ export async function getStocksValue(ns, player = null, stockSymbols = null) {
             - 100000 * (Math.sign(stk.pos[0]) + Math.sign(stk.pos[2])), 0);
 }
 
-/** @param {NS} ns 
+/** @param {NS} ns
  * Returns a helpful error message if we forgot to pass the ns instance to a function */
 export function checkNsInstance(ns, fnName = "this function") {
     if (!ns.print) throw new Error(`The first argument to ${fnName} should be a 'ns' instance.`);
@@ -452,7 +454,7 @@ export function getConfiguration(ns, argsSchema) {
     // If the user has a local config file, override the defaults in the argsSchema
     const confName = `${scriptName}.config.txt`;
     const overrides = ns.read(confName);
-    const overriddenSchema = overrides ? [...argsSchema] : argsSchema; // Clone the original args schema    
+    const overriddenSchema = overrides ? [...argsSchema] : argsSchema; // Clone the original args schema
     if (overrides) {
         try {
             let parsedOverrides = JSON.parse(overrides); // Expect a parsable dict or array of 2-element arrays like args schema

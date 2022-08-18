@@ -54,7 +54,7 @@ export async function main(ns) {
                     addHud("Hashes", `${formatNumberShort(hashes[0], 3, 1)}/${formatNumberShort(hashes[1], 3, 1)}`,
                         `Current Hashes ${hashes[0].toLocaleString('en')} / Current Hash Capacity ${hashes[1].toLocaleString('en')}`);
                 }
-                // Detect and notify the HUD if we are liquidating hashes (selling them as quickly as possible)               
+                // Detect and notify the HUD if we are liquidating hashes (selling them as quickly as possible)
                 if (ns.isRunning('spend-hacknet-hashes.js', 'home', '--liquidate') || ns.isRunning('spend-hacknet-hashes.js', 'home', '-l')) {
                     addHud(" ", "Liquidating", 'You have a script running that is selling hashes as quickly as possible (likely `spend-hacknet-hashes.js --liquidate`)');
                 }
@@ -67,8 +67,8 @@ export async function main(ns) {
             }
 
             // Show total instantaneous script income and experience per second (values provided directly by the game)
-            addHud("Scr Inc", formatMoney(ns.getScriptIncome()[0], 3, 2) + '/sec', "Total 'instantenous' income per second being earned across all scripts running on all servers.");
-            addHud("Scr Exp", formatNumberShort(ns.getScriptExpGain(), 3, 2) + '/sec', "Total 'instantenous' hack experience per second being earned across all scripts running on all servers.");
+            addHud("Scr Inc", formatMoney(ns.getTotalScriptIncome()[0], 3, 2) + '/sec', "Total 'instantenous' income per second being earned across all scripts running on all servers.");
+            addHud("Scr Exp", formatNumberShort(ns.getTotalScriptExpGain(), 3, 2) + '/sec', "Total 'instantenous' hack experience per second being earned across all scripts running on all servers.");
 
             // Show reserved money
             const reserve = Number(ns.read("reserve.txt") || 0);
@@ -184,7 +184,7 @@ async function getGangInfo(ns) {
     return await getNsDataThroughFile(ns, 'ns.gang.inGang() ? ns.gang.getGangInformation() : false', '/Temp/gang-stats.txt')
 }
 
-/** @param {NS} ns 
+/** @param {NS} ns
  * @returns {Promise<Server[]>} **/
 async function getAllServersInfo(ns) {
     const serverNames = await getNsDataThroughFile(ns, 'scanAllServers(ns)', '/Temp/scanAllServers.txt');
